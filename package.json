@@ -17,6 +17,7 @@
     "acorn": "^8.17.0",
     "effect": "4.0.0-beta.101",
     "firecrawl": "4.30.1",
+    "ioredis": "5.11.1",
     "zod": "3.25.76"
   },
   "peerDependencies": {
