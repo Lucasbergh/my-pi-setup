@@ -2,25 +2,29 @@
  * Domain model for subagents.
  *
  * Everything downstream of a backend (manager, tools, UI) speaks only these
- * types. Backends translate their native streams (pi session events, Claude
- * Agent SDK messages, Codex app-server JSON-RPC notifications) into the
+ * types. Backends translate their native streams (pi session events) into the
  * normalized `SubagentEvent` union.
+ *
+ * Fork note: upstream also shipped `claude` (Claude Agent SDK) and `codex`
+ * backends. They were removed so every subagent is an in-process pi session
+ * that inherits the parent's provider (API-key billed: anthropic/openrouter).
  */
 
 import type { ModelRegistry } from "@earendil-works/pi-coding-agent";
 import { Data } from "effect";
 
-export const BACKEND_NAMES = ["pi", "claude", "codex"] as const;
-export type BackendName = (typeof BACKEND_NAMES)[number];
+/** Harnesses the model may pick in subagent_spawn. */
+export const BACKEND_NAMES = ["pi"] as const;
+/** Registry keys: real harnesses plus scripted `stub-*` test backends. */
+export type BackendName = (typeof BACKEND_NAMES)[number] | `stub-${string}`;
 
 /** Who initiated the session. User asides stay out of model-facing tooling. */
 export type SubagentOrigin = "model" | "btw";
 
 /**
  * Shared reasoning-effort scale (pi's thinking levels). Each backend maps a
- * value to its nearest native equivalent: pi uses it directly, codex
- * translates to its reasoning-effort slugs, claude translates to thinking
- * budgets. Omitted = backend default (pi inherits the parent level).
+ * value to its nearest native equivalent: pi uses it directly.
+ * Omitted = backend default (pi inherits the parent level).
  */
 export const REASONING_EFFORTS = [
   "off",
@@ -54,8 +58,7 @@ export interface SpawnTask {
   readonly cwd: string;
   /**
    * Generic model hint, interpreted per backend:
-   * pi: "provider/model-id" or bare model id; claude: model alias;
-   * codex: model slug. Omitted = backend default / inherit.
+   * pi: "provider/model-id" or bare model id. Omitted = inherit the parent.
    */
   readonly model?: string;
   /** Shared effort scale; each backend maps it to its native equivalent. */

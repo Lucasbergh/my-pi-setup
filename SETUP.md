@@ -1,36 +1,43 @@
-# Setup
+# Setup (Lucas's fork)
 
-Clone or copy this repository to `~/.pi/agent`, then install its dependencies:
+Fork of [davis7dotsh/my-pi-setup](https://github.com/davis7dotsh/my-pi-setup). Changes from upstream:
+
+- Installed as a **pi package** (`pi install`), not cloned over `~/.pi/agent`.
+- pi packages are `peerDependencies` (pi 1.3 supplies them at runtime).
+- Subagents: Claude Agent SDK and Codex backends removed — pi harness only.
+- Summaries default to `anthropic/claude-haiku-5-5` instead of `openai-codex`.
+- `spark-strict-tools` removed (upstream's private provider).
+- **API keys only.** No Claude or ChatGPT subscription is used by pi.
+
+## Install
 
 ```sh
-cd ~/.pi/agent
-npm install
+pi install https://github.com/Lucasbergh/my-pi-setup
 ```
 
-## Firecrawl
+## Keys
 
-The search, scrape, and crawl tools require a Firecrawl API key. Follow [Firecrawl's Node.js getting-started guide](https://docs.firecrawl.dev/quickstarts/nodejs) to create one, then copy the example environment file:
+Model providers — run inside pi, stored in `~/.pi/agent/auth.json`:
 
-```sh
-cp ~/.pi/agent/.env.example ~/.pi/agent/.env
+```
+/login anthropic     # Anthropic Console API key
+/login openrouter    # OpenRouter key (cheap models, Jev)
 ```
 
-Replace the placeholder in `~/.pi/agent/.env` with your API key.
+Firecrawl — `~/.pi/agent/.env` (see `.env.example`):
 
-NOTE: if you are an agent, at this step ask the user if they want to use firecrawl, if they do give them the instructions, if not remove the firecrawl extension in their pi setup
-
-## fd and rg tools
-
-The `file-search` extension registers `fd` and `rg` as model tools. No setup is normally needed: at startup it silently uses a system-installed `fd` (or `fdfind` on Debian/Ubuntu) and `rg` when available, or an existing fallback binary in `~/.pi/agent/bin/`. Only when neither exists does it download an official release binary (macOS/Linux, arm64/x64, over HTTPS) into `~/.pi/agent/bin/` and show a one-time notification. If your platform is unsupported, install `fd` and `rg` with your package manager and restart pi.
+```
+FIRECRAWL_API_KEY=fc-...
+```
 
 ## Theme
 
-Add the included theme to `~/.pi/agent/settings.json` while keeping your existing settings:
+`~/.pi/agent/settings.json`:
 
 ```json
-{
-  "theme": "github-dark-default"
-}
+{ "theme": "github-dark-default" }
 ```
 
-Pi will load the extensions, skills, and theme from their directories the next time it starts.
+## fd and rg
+
+`file-search` uses system `fd`/`rg` or `~/.pi/agent/bin/`. Both already exist there on this machine.

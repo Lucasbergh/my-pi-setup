@@ -29,9 +29,11 @@ export interface SummaryConfig {
 }
 
 export const DEFAULT_SUMMARY_CONFIG: SummaryConfig = {
-  provider: "openai-codex",
-  model: "gpt-5.6-luna",
-  reasoning: "medium",
+  // Fork: metered Anthropic API key instead of upstream's openai-codex
+  // (ChatGPT subscription) default. Change with /summary-model.
+  provider: "anthropic",
+  model: "claude-haiku-5-5",
+  reasoning: "low",
 };
 
 const extensionDirectory = dirname(dirname(fileURLToPath(import.meta.url)));
